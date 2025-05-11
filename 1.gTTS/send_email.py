@@ -1,4 +1,7 @@
 import asyncio
+import os
+from email.mime.application import MIMEApplication
+
 from aiosmtplib import SMTP
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -21,6 +24,17 @@ async def send_email():
     body = "<h3>Це тестовий лист, надісланий через SMTP сервер ukr.net з Python.</h3>"
     body_part = MIMEText(body, "html")
     email_message.attach(body_part)
+
+    # Прикріплення файлу
+    file_path = "hello.mp3"  # змінити на свій файл
+    if os.path.exists(file_path):
+        with open(file_path, "rb") as file:
+            part = MIMEApplication(file.read(), Name=os.path.basename(file_path))
+            part["Content-Disposition"] = f'attachment; filename="{os.path.basename(file_path)}"'
+            email_message.attach(part)
+    else:
+        print(f"Файл не знайдено: {file_path}")
+        return
 
     # Надсилання
     try:
